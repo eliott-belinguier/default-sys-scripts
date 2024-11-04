@@ -1,4 +1,7 @@
 backup() {
+    local color_red
+    local color_yellow
+    local color_reset
     local path_base
     local path_current
     local path_snapshot
@@ -8,16 +11,19 @@ backup() {
         echo
         echo "Options:"
         echo "  -l                 List available snapshots in the current path"
-        echo "  <snapshot>         Navigate to the specified snapshot directory"
+        echo "  <snapshot>         Navigate to the specified snapshot directory and open a new Bash session"
         echo
         echo "Description:"
         echo "  This script allows you to list and navigate through ZFS snapshots."
         echo "  When executed from within /storage/archive or /storage/scratch,"
         echo "  the command can access the snapshots stored under .zfs/snapshot."
         echo
+        echo "  Note: When navigating to a snapshot, the script will open a new Bash session."
+        echo "        To exit the snapshot location, simply exit the current Bash session."
+        echo
         echo "Examples:"
         echo "  backup -l          Lists all snapshots available in the current directory"
-        echo "  backup snapshot1    Navigates to the 'snapshot1' directory if it exists"
+        echo "  backup snapshot1    Navigates to the 'snapshot1' directory if it exists and opens a new Bash session"
         echo
         return
     fi
@@ -45,7 +51,11 @@ backup() {
     snapshot="$1"
     path_snapshot=$path_snapshot/$snapshot$path_current
     if [[ -d "$path_snapshot" ]]; then
-        cd "$path_snapshot" || { echo "Error: Could not access the snapshot."; return 1; }
+        color_red="\033[91m"
+        color_yellow="\033[93m"
+        color_reset="\033[0m"
+        echo -e "\n\n${color_red}Navigating to snapshot '${color_yellow}$snapshot${color_red}' at '${color_yellow}$path_snapshot${color_red}'. To return, type 'exit' to close the opened shell.${color_reset}\n\n"
+        $SHELL -c "cd "$path_snapshot" && $SHELL" || { echo "Error: Could not access the snapshot."; return 1; }
     else
         echo "Error: The specified snapshot does not exist for this path."
         return 2
