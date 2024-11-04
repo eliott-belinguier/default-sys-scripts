@@ -1,0 +1,53 @@
+backup() {
+    local path_base
+    local path_current
+    local path_snapshot
+
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: backup [options] <snapshot>"
+        echo
+        echo "Options:"
+        echo "  -l                 List available snapshots in the current path"
+        echo "  <snapshot>         Navigate to the specified snapshot directory"
+        echo
+        echo "Description:"
+        echo "  This script allows you to list and navigate through ZFS snapshots."
+        echo "  When executed from within /storage/archive or /storage/scratch,"
+        echo "  the command can access the snapshots stored under .zfs/snapshot."
+        echo
+        echo "Examples:"
+        echo "  backup -l          Lists all snapshots available in the current directory"
+        echo "  backup snapshot1    Navigates to the 'snapshot1' directory if it exists"
+        echo
+        return
+    fi
+    path_base="/storage"
+    path_current="$(realpath "$(pwd)")"
+    if [[ "$path_current" == "$path_base/archive"* ]]; then
+        path_current=${path_current#"$path_base/archive"}
+        path_snapshot="${path_base}/archive/.zfs/snapshot"
+    elif [[ "$path_current" == "$path_base/scratch"* ]]; then
+        path_current=${path_current#"$path_base/scratch"}
+        path_snapshot="${path_base}/scratch/.zfs/snapshot"
+    else
+        echo "Error: This command can only be used in /storage/archive or /storage/scratch."
+        return 1
+    fi
+    if [[ "$1" == "-l" ]]; then
+        echo "Snapshots containing the current directory:"
+        for snapshot in "$path_snapshot"/*; do
+            if [[ -d "$snapshot$path_current" ]]; then
+                basename "$snapshot"
+            fi
+        done | sort
+        return 0
+    fi
+    snapshot="$1"
+    path_snapshot=$path_snapshot/$snapshot$path_current
+    if [[ -d "$path_snapshot" ]]; then
+        cd "$path_snapshot" || { echo "Error: Could not access the snapshot."; return 1; }
+    else
+        echo "Error: The specified snapshot does not exist for this path."
+        return 2
+    fi
+}
