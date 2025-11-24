@@ -1,0 +1,9 @@
+---
+- name: Install Bash Configuration
+  hosts: all
+  become: yes
+
+  roles:
+    - role: bashrc
+      vars:
+        bashrc_state: present

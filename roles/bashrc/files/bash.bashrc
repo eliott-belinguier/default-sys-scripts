@@ -9,4 +9,3 @@ if [ -d /etc/bashrc.d ]; then
         fi
     done
 fi
-

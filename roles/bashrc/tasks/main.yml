@@ -1,0 +1,13 @@
+---
+- name: Validate 'bashrc_state' variable
+  fail:
+    msg: "The variable 'bashrc_state' is required and must be set to 'present' or 'absent'."
+  when: bashrc_state is not defined or bashrc_state not in ['present', 'absent']
+
+- name: Execute installation tasks
+  include_tasks: install.yml
+  when: bashrc_state == 'present'
+
+- name: Execute uninstallation tasks
+  include_tasks: uninstall.yml
+  when: bashrc_state == 'absent'
