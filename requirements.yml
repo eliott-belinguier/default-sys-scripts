@@ -1,0 +1,6 @@
+---
+roles:
+  - src: https://github.com/eliott-belinguier/ansible-role-install-bash-prompt.git
+    scm: git
+    version: v1.0
+    name: bash-prompt

@@ -1,5 +1,0 @@
----
-bashrc_state: present
-bashprompt_target_file: /etc/bash.prompt
-bashrc_target_file: /etc/bash.bashrc
-bashrc_marker_name: "CUSTOM BASHRC CONFIGURATION"
